@@ -1,0 +1,5 @@
+A: test personalizzato
+0: Lista di comandi in "assets/test-00.txt"
+1: Lista di comandi in "assets/test-01.txt"
+2: Lista di comandi in "assets/test-02.txt"
+3: Lista di comandi in "assets/test-03.txt"

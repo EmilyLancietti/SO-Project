@@ -1,0 +1,9 @@
+pnew process1
+pinfo process1
+pnew process1
+pinfo process1
+pclose process1
+pnew process2
+pspawn process2
+ptree
+quit

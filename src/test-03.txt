@@ -1,0 +1,11 @@
+pnew process1 process2 process3
+pspawn process1 process1 process1 process1
+pspawn process2 process2 process2 process2
+pspawn process3 process3 process3
+pinfo process1
+pclose process2 process3
+plist
+ptreeall
+pspawn process2
+psearch process2
+ptree

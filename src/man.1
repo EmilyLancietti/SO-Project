@@ -1,0 +1,111 @@
+.TH projectmanager 1 "SysOp Lab '16/'17" "180071-181842-183864" "Help Page"
+.SH NAME
+pmanager \- gestione di processi attraverso una shell bash custom
+
+.SH SYNOPSIS
+.B pmanager [\fIfile\fR]
+
+Nel caso in cui esista il parametro \fIfile\fR, questo viene interpretato come il nome
+di in file di testo contenente un elenco di comandi da eseguire.
+
+.SH DESCRIPTION
+\fBProject Manager\fR è un gestore di processi che, attraverso una shell interattiva
+custom ed una serie di comandi indicati consente all'utente di generare nuovi
+processi abbinandoli ad un nome ed interagire con essi.
+
+Per una descrizione dettagliata del funzionamento di
+\fBProject Manager\fR,
+consultare il file
+\fIREADME\fR
+situato nella directory principale.
+
+
+.SH COMMANDS
+.TP
+\fBphelp\fR
+Mostra la pagina di manuale per \fBpmanager\fR contenente la lista dei comandi
+disponibili.
+.TP
+\fBplist\fR
+Mostra un elenco dei processi attivi generati dall'utente.
+.TP
+\fBplistall\fR
+Mostra un elenco completo di tutti i processi generati dall'utente.
+.TP
+\fBptree\fR
+Mostra la gerarchia dei processi attivi generati dall'utente.
+.TP
+\fBptreeall\fR
+Mostra la gerarchia completa di tutti processi generati dall'utente.
+.TP
+\fBpsearch \fI<nome>\fR ...\fR
+Mostra un elenco completo di tutti i processi denominati <nome> generati dall'utente.
+.TP
+\fBpinfo \fI<nome>\fR ...\fR
+Mostra informazioni dettagliate sul processo <nome>.
+.TP
+\fBpnew \fI<nome>\fR ...\fR
+Genera un nuovo processo con nome <nome>.
+.TP
+\fBpclose \fI<nome>\fR ...\fR
+Termina, se possibile, il processo <nome>. Non è possibile chiudere un processo
+qualora esso abbia generato altri processi attualmente in esecuzione.
+.TP
+\fBpspawn \fI<nome>\fR ...\fR
+Clona il processo <nome> generando un processo <nome_i> con i progressivo.
+.TP
+\fBprmall \fI<nome>\fR ...\fR
+Termina il processo <nome> chiudendo anche gli eventuali processi generati.
+.TP
+\fBquit\fR
+Chiusura di \fBpmanager\fR.
+
+.SH EXAMPLES
+Generazione di un processo e richiesta di informazioni:
+.PP
+.nf
+.RS
+
+\fBpnew\fR <nome>
+\fBpinfo\fR <nome>
+
+.RE
+.fi
+.PP
+
+Generazione di due processi in sequenza e successiva terminazione:
+.PP
+.nf
+.RS
+
+\fBpnew\fR <nome1> <nome2>
+\fBpclose\fR <nome1> <nome2>
+
+.RE
+.fi
+.PP
+
+Generazione di un processo, clonazione e stampa della struttura gerarchica completa:
+.PP
+.nf
+.RS
+
+\fBpnew\fR <nome1>
+\fBpspawn\fR <nome1>
+\fBptreeall\fR
+.RE
+.fi
+.PP
+
+Terminazione di un processo e uscita da \fBpmanager\fR:
+
+.PP
+.nf
+.RS
+
+\fBpclose\fR <nome>
+\fBquit\fR
+
+.RE
+.fi
+.PP

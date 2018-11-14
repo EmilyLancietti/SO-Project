@@ -1,0 +1,8 @@
+pnew process1 process2 process3
+pinfo process1
+pclose process1
+pinfo process1
+pspawn process2 process2 process2 process2
+pspawn process3
+ptreeall
+quit

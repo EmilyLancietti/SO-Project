@@ -1,0 +1,139 @@
+--------------------------------------------------
+---Progetto di Sistemi Operativi A.A. 2016/2017---
+--------------------------------------------------
+
+# Studenti
+
+180071 | Filippo Frezza
+181842 | Emanuele Nardi
+183864 | Emily Lancietti
+
+# Progetto scelto
+
+Project Manager: gestione di processi attraverso una shell interattiva custom
+
+# File principali
+.
+├── assets
+│   ├── man.1
+│   ├── test_choice.sh
+│   ├── test-list.txt
+│   └── tests
+│   	├── test.txt
+│   	├── test-00.txt
+│   	├── test-01.txt
+│   	└── test-02.txt
+├── build
+│   ├── child
+│   ├── customShell
+│   └── pmanager
+├── Makefile
+├── README
+└── src
+    ├── child.c
+    ├── customShell.c
+    ├── customShellLib.c
+    ├── customShellLib.h
+    ├── man.1
+    ├── pmanager.c
+    ├── README
+    ├── test_choice.sh
+    ├── test-00.txt
+    ├── test-01.txt
+    ├── test-02.txt
+    ├── test-03.txt
+    ├── test-list.txt
+    ├── treeLib.c
+    └── treeLib.h
+
+# Funzionamento
+
+La chiamata iniziale viene affidata al processo "pmanager" il quale ha i seguenti compiti:
+    + Invocazione di una shell bash ed esecuzione di "customShell", responsabile della sua gestione;
+    + Reindirizzamento di eventuali parametri in ingresso.
+
+Queste operazioni vengono giustificate dalla possibilità di usufruire di una shell interattiva
+in grado di interpretare ed eseguire dei comandi personalizzati per la creazione e la gestione di nuovi processi.
+
+Successivamente il controllo passa al processo "customShell", al quale vengono affidati i seguenti compiti:
+    + Lettura, parsing ed esecuzione dei comandi inseriti dall'utente, in particolare per:
+        - Creazione diretta o indiretta di nuovi processi;
+        - Terminazione di uno o più processi;
+        - Recupero di informazioni sui processi;
+    + Creazione e mantenimento di una struttura dati per la memorizzazione di informazioni utili sui processi generati;
+    + Creazione e sincronizzazione di un canale di comunicazione per lo scambio di messaggi;
+    + Gestione dei segnali.
+
+Ogniqualvolta vengano generati nuovi processi, la gestione di questi ultimi viene affidata a "child",
+il quale ha il compito di rispondere ai segnali ricevuti dal processo principale "customShell".
+I segnali possono riferirsi a:
+    + Richiesta di creare nuovi processi;
+    + Sincronizzazione del canale di comunicazione per lo scambio di messaggi;
+    + Richiesta di terminazione del processo stesso.
+
+# Implementazione generale delle funzionalità
+
+PMANAGER
+
+L'invocazione della shell bash e l'esecuzione del programma "customShell" avviene attraverso la chiamata di sistema 'system' secondo due possibili modalità:
+    + Se sono presenti parametri in ingresso, vengono reindirizzati come input a "customShell";
+    + viene invocato "customShell" senza parametri altrimenti.
+
+CUSTOMSHELL
+
+La lettura dei comandi inseriti dall'utente viene eseguita riga per riga dallo stream 'stdin' nel caso in cui il programma venga lanciato in assenza di parametri,
+oppure dal file di testo passato come parametro nel caso in cui venga lanciato in modalità di testing.
+Successivamente vengono effettutate in sequenza le seguenti operazioni:
+    + Confronto con i vari comandi messi a disposizione da "CustomShell";
+    + Verifica della sintassi attraverso il controllo sull'esistenza di eventuali parametri;
+    + Esecuzione del comando selezionato, implementato nella libreria di supporo "customShellLib";
+
+Per la memorizzazione delle informazioni relative ai processi si fa affidamento sulla liberia "treeLib",
+che definisce una struttura dati ad albero implementata come una lista doppiamente linkata.
+Ogni nodo dell'albero contiene le informazioni relative al processo, quali:
+    + Process Identifier (PID);
+    + Parent Process Identifier (PPID);
+    + Numero di sottoprocessi generati;
+    + Nome associato al processo
+    + Stato attuale del processo (attivo/chiuso);
+    + Data di creazione;
+    + Data di terminazione.
+
+Tra le funzionalità principali messe a disposizione ci sono:
+    + Stampa dei processi (sequenziale/gerarchica);
+    + Ricerca nell'albero dei processi (per nome/per PID);
+    + Inserimento e rimozione di uno o più nodi.
+
+NB: Ogni operazione sull'albero dei processi viene fatta esclusivamente dal processo principale,
+garantendo una gestione centralizzata dell'intera struttura.
+
+La gestione delle comunicazioni tra i processi viene implementata tramite l'utilizzo di una pipe con nome,
+alla quale il processo principale vi accede in lettura, mentre i vari sottoprocessi vi accedono in scrittura.
+La sincronizzazione delle operazioni di apertura/chiusura e delle operazioni di scrittura/lettura
+viene risolta attraverso l'invio di segnali in entrambe le direzioni tra il processo principale e il processo figlio.
+
+NB: Poichè l'esecuzione dei comandi all'interno della shell è strettamente sequenziale non è possibile che più sottoprocessi accedano alla pipe concorrentemente.
+
+CHILD
+
+Le risposte alle richieste di clonazione e terminazione vengono implementate all'interno di diversi signal_handlers,
+attraverso la modifica di flag_globali, che "svegliano" il processo dallo stato di sleep in cui si trova.
+
+NB: Per la gestione della scincronizzazione e dello scambio di messaggi vedi sopra.
+
+# Migliorie approntate
+
++ aggiunta del file README per la regola 'help' del Makefile;
++ aggiunta della regola 'run' del Makefile per l'esecuzione del programma;
++ nella modalità di testing è possibile decidere se generare dinamicamente il file di test oppure servirsi dei test predefiniti;
++ al termine dell'esecuzione del test è possibile continuare ad utilizzare la sub-shell;
++ aggiunta del comando 'plistall' per la stampa della cronologia a lista completa dei processi;
++ aggiunta del comando 'ptreeall' per la stampa della cronologia gerarchica completa dei processi;
++ aggiunta del comando 'psearch' per consentire la visualizzazione dei processi omonimi;
++ aggiunta della possibilità di poter eseguire un comando sequenzialmente su tutti i parametri passati in input qualora siano richiesti.
+
+# Note aggiuntive
+
++ Il comando "phelp" non è disponibile se prima non viene eseguito la regola "make assets";
++ Non è consentito generare un processo con nome "pmanager";
++ Non è consentito clonare il processo con nome "pmanager".

@@ -1,0 +1,8 @@
+pnew process1
+pnew process1
+pnew process1
+psearch process1
+pclose process1
+plist
+plistall
+quit
